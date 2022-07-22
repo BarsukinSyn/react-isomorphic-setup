@@ -1,6 +1,12 @@
 # Dependencies
 node_modules
 
+# Build
+build
+
+# Environment
+.env
+
 #Tools
 .idea
 .vscode
