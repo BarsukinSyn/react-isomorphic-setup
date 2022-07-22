@@ -1,3 +1,6 @@
 import React, { FC } from 'react'
 
-export const App: FC = () => <h1>Hello, World!</h1>
+import styles from './app.module.scss'
+import './styles.scss'
+
+export const App: FC = () => <h1 className={styles.title}>Hello, World!</h1>

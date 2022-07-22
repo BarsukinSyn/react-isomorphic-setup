@@ -3,6 +3,7 @@ import path from 'path'
 
 export interface AssetManifestFileMap {
   js: string[]
+  css: string[]
 }
 
 export class AssetManifestMapper {
@@ -23,10 +24,11 @@ export class AssetManifestMapper {
     const manifestFileMap = manifestEntries.reduce<AssetManifestFileMap>(
       (map, [fileName, src]) => {
         if (fileName.endsWith('.js')) map.js = map.js.concat(src)
+        if (fileName.endsWith('.css')) map.css = map.css.concat(src)
 
         return map
       },
-      { js: [] }
+      { js: [], css: [] }
     )
 
     return manifestFileMap
