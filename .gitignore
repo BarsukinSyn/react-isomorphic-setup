@@ -4,6 +4,7 @@ node_modules
 #Tools
 .idea
 .vscode
+.husky
 
 # Misc
 .DS_Store

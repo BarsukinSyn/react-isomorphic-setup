@@ -1,6 +1,13 @@
 {
   "name": "react-isomorphic-setup",
-  "scripts": {},
+  "scripts": {
+    "prepare": "husky install && husky add .husky/pre-commit 'npm run fix'",
+    "fix": "pretty-quick --staged --bail --no-restage"
+  },
   "dependencies": {},
-  "devDependencies": {}
+  "devDependencies": {
+    "husky": "^8.0.1",
+    "prettier": "^2.7.1",
+    "pretty-quick": "^3.1.3"
+  }
 }
