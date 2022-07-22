@@ -1,9 +1,16 @@
 # Dependencies
 node_modules
 
+# Build
+build
+
+# Environment
+.env
+
 #Tools
 .idea
 .vscode
+.husky
 
 # Misc
 .DS_Store
