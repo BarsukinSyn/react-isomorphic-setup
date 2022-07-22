@@ -2,17 +2,26 @@
   "name": "react-isomorphic-setup",
   "scripts": {
     "prepare": "husky install && husky add .husky/pre-commit 'npm run fix'",
-    "dev": "nodemon",
+    "dev": "npm run dev:serve & npm run dev:watch",
+    "dev:serve": "webpack serve --config-name client",
+    "dev:watch": "nodemon",
     "fix": "pretty-quick --staged --bail --no-restage"
   },
   "dependencies": {
     "dotenv": "^16.0.1",
-    "polka": "^0.5.2"
+    "polka": "^0.5.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "sirv": "^2.0.2"
   },
   "devDependencies": {
+    "@pmmmwh/react-refresh-webpack-plugin": "^0.5.7",
     "@types/node": "^18.0.6",
     "@types/polka": "^0.5.4",
+    "@types/react": "^18.0.15",
+    "@types/react-dom": "^18.0.6",
     "@types/webpack-node-externals": "^2.5.3",
+    "clean-webpack-plugin": "^4.0.0",
     "husky": "^8.0.1",
     "nodemon": "^2.0.19",
     "prettier": "^2.7.1",
@@ -21,6 +30,9 @@
     "typescript": "^4.7.4",
     "webpack": "^5.73.0",
     "webpack-cli": "^4.10.0",
+    "webpack-dev-server": "^4.9.3",
+    "webpack-manifest-plugin": "^5.0.0",
+    "webpack-merge": "^5.8.0",
     "webpack-node-externals": "^3.0.0"
   }
 }
