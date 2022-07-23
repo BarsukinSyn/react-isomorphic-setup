@@ -1,6 +1,7 @@
 import React, { FC } from 'react'
 
-import styles from './app.module.scss'
+import { Catalog } from './catalog'
+
 import './styles.scss'
 
-export const App: FC = () => <h1 className={styles.title}>Hello, World!</h1>
+export const App: FC = () => <Catalog />

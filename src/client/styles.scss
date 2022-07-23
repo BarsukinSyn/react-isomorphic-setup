@@ -1,1 +1,20 @@
 @import 'reset-css';
+
+@import './theming.scss';
+
+body {
+  font-family: sans-serif;
+  color: var(--document-text-color);
+  background-color: var(--document-background-color);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+noscript {
+  display: block;
+  padding: 0.75rem;
+  color: #fff;
+  font-weight: bold;
+  text-align: center;
+  background-color: #d61822;
+}
