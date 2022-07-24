@@ -4,6 +4,9 @@ import { AppRenderer } from '../services/app-renderer'
 
 export function renderCatalog(appRenderer: AppRenderer): Middleware {
   return function middleware(req, res) {
-    appRenderer.renderToStream(req, res)
+    const personalizedSubtitle = 'We have spells if you have coin'
+    const initialAppState = { catalog: { personalizedSubtitle } }
+
+    appRenderer.renderToStream(req, res, initialAppState)
   }
 }

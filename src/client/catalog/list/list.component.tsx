@@ -17,9 +17,7 @@ export const List: FC<ListProps> = ({ linkList = [], className }) => (
   <ol className={cn(styles.list, className)}>
     {linkList.map(({ path, name }) => (
       <li key={path} className={styles.listItem}>
-        <a href='#' className={styles.link}>
-          {name}
-        </a>
+        {name}
       </li>
     ))}
   </ol>
