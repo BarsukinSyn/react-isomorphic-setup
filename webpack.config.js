@@ -20,6 +20,7 @@ const clientPathMap = {
 }
 const assetOutputPathMap = {
   styles: 'styles/[name].css',
+  images: 'images/[name][ext]',
   manifest: resolve(buildPath, 'asset-manifest.json')
 }
 
@@ -27,6 +28,14 @@ const common = {
   mode: 'development',
   resolve: {
     extensions: ['.js', '.ts', '.tsx']
+  },
+  module: {
+    rules: [
+      {
+        test: /\.svg$/,
+        type: 'asset/inline'
+      }
+    ]
   }
 }
 
@@ -93,6 +102,14 @@ const clientConfig = merge(common, {
             }
           }
         ]
+      },
+      {
+        test: /\.(gif|png|jpe?g)$/,
+        type: 'asset/resource',
+        generator: {
+          filename: assetOutputPathMap.images,
+          publicPath: PUBLIC_PATH
+        }
       }
     ]
   },
@@ -146,6 +163,15 @@ const serverConfig = merge(common, {
           },
           'sass-loader'
         ]
+      },
+      {
+        test: /\.(gif|png|jpe?g)$/,
+        type: 'asset/resource',
+        generator: {
+          filename: assetOutputPathMap.images,
+          publicPath: PUBLIC_PATH,
+          emit: false
+        }
       }
     ]
   },
