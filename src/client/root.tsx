@@ -5,14 +5,19 @@ export const doctype = '<!DOCTYPE html>'
 export const documentSeparator = '-~-'
 
 export interface RootProps {
+  faviconPath?: string
   jsFilePaths?: string[]
   cssFilePaths?: string[]
 }
 
 export const Root: FC<RootProps> = ({
+  faviconPath = '',
   jsFilePaths = [],
   cssFilePaths = []
 }) => {
+  const faviconLinkTag = faviconPath && (
+    <link rel='icon' type='image/x-icon' href={faviconPath} />
+  )
   const externalScriptTagList = jsFilePaths.map((src, i) => (
     <script defer src={src} key={i} />
   ))
@@ -29,6 +34,7 @@ export const Root: FC<RootProps> = ({
         <title>React Isomorphic App</title>
         {externalScriptTagList}
         {styleSheetLinkTagList}
+        {faviconLinkTag}
       </head>
       <body>
         <noscript>You need to enable JavaScript to use this app</noscript>

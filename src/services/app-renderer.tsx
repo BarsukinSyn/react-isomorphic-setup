@@ -31,9 +31,9 @@ export class AppRenderer {
   }
 
   #renderDocument(): string {
-    const { js, css } = this.#assetManifestFileMap
+    const { favicon, js, css } = this.#assetManifestFileMap
     const document = ReactDOMServer.renderToStaticMarkup(
-      <Root jsFilePaths={js} cssFilePaths={css} />
+      <Root faviconPath={favicon} jsFilePaths={js} cssFilePaths={css} />
     )
 
     return document
