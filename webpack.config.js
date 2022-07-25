@@ -2,6 +2,7 @@ const dotenv = require('dotenv')
 const { resolve } = require('path')
 const { exec } = require('child_process')
 const { merge } = require('webpack-merge')
+const CopyPlugin = require('copy-webpack-plugin')
 const nodeExternals = require('webpack-node-externals')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
@@ -14,12 +15,15 @@ const PUBLIC_PATH = process.env.PUBLIC_PATH
 
 const srcPath = resolve(__dirname, 'src')
 const buildPath = resolve(__dirname, 'build')
+const staticPath = resolve(__dirname, 'public')
 const clientPathMap = {
   entry: resolve(srcPath, 'client', 'entry.tsx'),
   output: resolve(buildPath, 'public')
 }
 const assetOutputPathMap = {
+  fonts: 'fonts/[name][ext]',
   styles: 'styles/[name].css',
+  images: 'images/[name][ext]',
   manifest: resolve(buildPath, 'asset-manifest.json')
 }
 
@@ -27,6 +31,14 @@ const common = {
   mode: 'development',
   resolve: {
     extensions: ['.js', '.ts', '.tsx']
+  },
+  module: {
+    rules: [
+      {
+        test: /\.svg$/,
+        type: 'asset/inline'
+      }
+    ]
   }
 }
 
@@ -62,6 +74,11 @@ const clientConfig = merge(common, {
         sockHost: `${devServer.host}:${devServer.port}`
       }
     }),
+    new CopyPlugin({
+      patterns: [
+        { from: resolve(staticPath, 'root'), to: clientPathMap.output }
+      ]
+    }),
     new MiniCssExtractPlugin({
       filename: assetOutputPathMap.styles
     }),
@@ -87,12 +104,34 @@ const clientConfig = merge(common, {
           'css-loader',
           'postcss-loader',
           {
+            loader: 'resolve-url-loader',
+            options: {
+              root: staticPath
+            }
+          },
+          {
             loader: 'sass-loader',
             options: {
               sourceMap: true // required for loaders preceding url resolver
             }
           }
         ]
+      },
+      {
+        test: /\.(gif|png|jpe?g)$/,
+        type: 'asset/resource',
+        generator: {
+          filename: assetOutputPathMap.images,
+          publicPath: PUBLIC_PATH
+        }
+      },
+      {
+        test: /\.(ttf|otf|woff2?)$/,
+        type: 'asset/resource',
+        generator: {
+          filename: assetOutputPathMap.fonts,
+          publicPath: PUBLIC_PATH
+        }
       }
     ]
   },
@@ -146,6 +185,15 @@ const serverConfig = merge(common, {
           },
           'sass-loader'
         ]
+      },
+      {
+        test: /\.(gif|png|jpe?g)$/,
+        type: 'asset/resource',
+        generator: {
+          filename: assetOutputPathMap.images,
+          publicPath: PUBLIC_PATH,
+          emit: false
+        }
       }
     ]
   },

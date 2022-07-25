@@ -2,6 +2,7 @@ import fs from 'fs'
 import path from 'path'
 
 export interface AssetManifestFileMap {
+  favicon: string
   js: string[]
   css: string[]
 }
@@ -23,12 +24,13 @@ export class AssetManifestMapper {
     const manifestEntries = Object.entries(this.#manifest)
     const manifestFileMap = manifestEntries.reduce<AssetManifestFileMap>(
       (map, [fileName, src]) => {
+        if (fileName.includes('favicon.ico')) map.favicon = src
         if (fileName.endsWith('.js')) map.js = map.js.concat(src)
         if (fileName.endsWith('.css')) map.css = map.css.concat(src)
 
         return map
       },
-      { js: [], css: [] }
+      { favicon: '', js: [], css: [] }
     )
 
     return manifestFileMap
