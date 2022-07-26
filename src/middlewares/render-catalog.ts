@@ -7,6 +7,6 @@ export function renderCatalog(appRenderer: AppRenderer): Middleware {
     const personalizedSubtitle = 'We have spells if you have coin'
     const initialAppState = { catalog: { personalizedSubtitle } }
 
-    appRenderer.renderToStream(req, res, initialAppState)
+    appRenderer.render(req, res, initialAppState)
   }
 }

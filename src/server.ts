@@ -12,8 +12,7 @@ const { NODE_ENV = 'production', PORT = 8000 } = process.env
 const IN_DEV = NODE_ENV === 'development'
 
 const assetManifestMapper = new AssetManifestMapper('asset-manifest.json')
-const assetManifestFileMap = assetManifestMapper.mapByFile()
-const appRenderer = new AppRenderer(assetManifestFileMap)
+const appRenderer = new AppRenderer(assetManifestMapper)
 
 const assets = serveStatic({ clientBuildPath: 'public', dev: IN_DEV })
 const catalog = renderCatalog(appRenderer)
