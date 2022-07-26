@@ -1,6 +1,7 @@
 import React from 'react'
 import ReactDOMServer from 'react-dom/server'
-import { ServerResponse as Response } from 'http'
+import { StaticRouter } from 'react-router-dom/server'
+import { IncomingMessage as Request, ServerResponse as Response } from 'http'
 
 import { App } from '../client/app'
 import { Root, doctype, documentSeparator } from '../client/root'
@@ -13,10 +14,10 @@ export class AppRenderer {
     this.#assetManifestFileMap = assetManifestFileMap
   }
 
-  renderToStream(res: Response) {
+  renderToStream(req: Request, res: Response) {
     const document = this.#renderDocument()
     const [startOfDocument, endOfDocument] = document.split(documentSeparator)
-    const app = this.#buildApp()
+    const app = this.#buildApp(req.url!)
 
     const stream = ReactDOMServer.renderToPipeableStream(app, {
       onShellReady() {
@@ -39,5 +40,9 @@ export class AppRenderer {
     return document
   }
 
-  #buildApp = () => <App />
+  #buildApp = (url: string) => (
+    <StaticRouter location={url}>
+      <App />
+    </StaticRouter>
+  )
 }
