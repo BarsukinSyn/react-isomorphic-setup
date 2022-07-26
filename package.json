@@ -8,6 +8,7 @@
     "fix": "pretty-quick --staged --bail --no-restage"
   },
   "dependencies": {
+    "classnames": "^2.3.1",
     "dotenv": "^16.0.1",
     "polka": "^0.5.2",
     "react": "^18.2.0",
