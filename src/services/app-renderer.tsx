@@ -5,19 +5,19 @@ import { IncomingMessage as Request, ServerResponse as Response } from 'http'
 
 import { App, InitialState } from '../client/app'
 import { Document, doctype, documentSeparator } from '../client/document'
-import { AssetManifestFileMap } from './asset-manifest-mapper'
+import { AssetManifestMap, AssetManifestMapper } from './asset-manifest-mapper'
 
 export class AppRenderer {
-  #assetManifestFileMap: AssetManifestFileMap
+  #assetManifestMap: AssetManifestMap
 
-  constructor(assetManifestFileMap: AssetManifestFileMap) {
-    this.#assetManifestFileMap = assetManifestFileMap
+  constructor(assetManifestMapper: AssetManifestMapper) {
+    this.#assetManifestMap = assetManifestMapper.map()
   }
 
-  renderToStream(req: Request, res: Response, initialAppState?: InitialState) {
+  render(req: Request, res: Response, initialAppState?: InitialState) {
+    const app = this.#buildApp(req.url!, initialAppState)
     const document = this.#renderDocument(initialAppState)
     const [startOfDocument, endOfDocument] = document.split(documentSeparator)
-    const app = this.#buildApp(req.url!, initialAppState)
 
     const stream = ReactDOMServer.renderToPipeableStream(app, {
       onShellReady() {
@@ -32,7 +32,7 @@ export class AppRenderer {
   }
 
   #renderDocument(initialAppState?: InitialState): string {
-    const { favicon, js, css } = this.#assetManifestFileMap
+    const { favicon, js, css } = this.#assetManifestMap
     const document = ReactDOMServer.renderToStaticMarkup(
       <Document
         faviconPath={favicon}
