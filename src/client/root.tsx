@@ -1,5 +1,7 @@
 import React, { FC } from 'react'
 
+import { InitialState } from './app'
+
 export const doctype = '<!DOCTYPE html>'
 
 export const documentSeparator = '-~-'
@@ -8,13 +10,19 @@ export interface RootProps {
   faviconPath?: string
   jsFilePaths?: string[]
   cssFilePaths?: string[]
+  initialAppState?: InitialState
 }
 
 export const Root: FC<RootProps> = ({
   faviconPath = '',
   jsFilePaths = [],
-  cssFilePaths = []
+  cssFilePaths = [],
+  initialAppState = {}
 }) => {
+  const initialAppStateString = JSON.stringify(initialAppState)
+  const initialAppStateScriptTag = (
+    <script id='initial-state' data-state-string={initialAppStateString} />
+  )
   const faviconLinkTag = faviconPath && (
     <link rel='icon' type='image/x-icon' href={faviconPath} />
   )
@@ -39,6 +47,7 @@ export const Root: FC<RootProps> = ({
       <body>
         <noscript>You need to enable JavaScript to use this app</noscript>
         <div id='root'>{documentSeparator}</div>
+        {initialAppStateScriptTag}
       </body>
     </html>
   )

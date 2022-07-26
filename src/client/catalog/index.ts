@@ -1,1 +1,2 @@
-export { Catalog } from './catalog.component'
+export { CatalogContainer as Catalog } from './catalog.container'
+export { catalogSlice } from './catalog.slice'
