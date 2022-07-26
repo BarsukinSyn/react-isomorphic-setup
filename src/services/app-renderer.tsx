@@ -4,7 +4,7 @@ import { StaticRouter } from 'react-router-dom/server'
 import { IncomingMessage as Request, ServerResponse as Response } from 'http'
 
 import { App, InitialState } from '../client/app'
-import { Root, doctype, documentSeparator } from '../client/root'
+import { Document, doctype, documentSeparator } from '../client/document'
 import { AssetManifestFileMap } from './asset-manifest-mapper'
 
 export class AppRenderer {
@@ -34,7 +34,7 @@ export class AppRenderer {
   #renderDocument(initialAppState?: InitialState): string {
     const { favicon, js, css } = this.#assetManifestFileMap
     const document = ReactDOMServer.renderToStaticMarkup(
-      <Root
+      <Document
         faviconPath={favicon}
         jsFilePaths={js}
         cssFilePaths={css}
