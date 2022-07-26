@@ -1,28 +1,22 @@
 import fs from 'fs'
 import path from 'path'
 
-export interface AssetManifestFileMap {
+export interface AssetManifestMap {
   favicon: string
   js: string[]
   css: string[]
 }
 
 export class AssetManifestMapper {
-  #manifest: {
-    [key: string]: string
-  }
+  #manifest: Record<string, string>
 
   constructor(filePath: string, encoding: BufferEncoding = 'utf-8') {
-    const fileAbsolutePath = path.resolve(__dirname, filePath)
-    const manifestData = fs.readFileSync(fileAbsolutePath, encoding)
-    const manifestJSON = JSON.parse(manifestData)
-
-    this.#manifest = manifestJSON
+    this.#manifest = this.#read(filePath, encoding)
   }
 
-  mapByFile(): AssetManifestFileMap {
+  map(): AssetManifestMap {
     const manifestEntries = Object.entries(this.#manifest)
-    const manifestFileMap = manifestEntries.reduce<AssetManifestFileMap>(
+    const manifestFileMap = manifestEntries.reduce<AssetManifestMap>(
       (map, [fileName, src]) => {
         if (fileName.includes('favicon.ico')) map.favicon = src
         if (fileName.endsWith('.js')) map.js = map.js.concat(src)
@@ -34,5 +28,13 @@ export class AssetManifestMapper {
     )
 
     return manifestFileMap
+  }
+
+  #read(filePath: string, encoding: BufferEncoding): Record<string, string> {
+    const fileAbsolutePath = path.resolve(__dirname, filePath)
+    const manifestData = fs.readFileSync(fileAbsolutePath, encoding)
+    const manifestJSON = JSON.parse(manifestData)
+
+    return manifestJSON
   }
 }
