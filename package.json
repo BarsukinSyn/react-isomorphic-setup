@@ -1,7 +1,10 @@
 {
   "name": "react-isomorphic-setup",
   "scripts": {
-    "prepare": "husky install && husky add .husky/pre-commit 'npm run fix'",
+    "prepare": "run-s prepare:**",
+    "prepare:husky:install": "husky install",
+    "prepare:husky:pre-commit": "husky add .husky/pre-commit 'npm run fix'",
+    "prepare:config:dotenv": "shx cp -u .env.template .env",
     "dev": "npm run dev:serve & npm run dev:watch",
     "dev:serve": "webpack serve --config-name client",
     "dev:watch": "nodemon",
@@ -32,6 +35,7 @@
     "husky": "^8.0.1",
     "mini-css-extract-plugin": "^2.6.1",
     "nodemon": "^2.0.19",
+    "npm-run-all": "^4.1.5",
     "postcss": "^8.4.14",
     "postcss-loader": "^7.0.1",
     "postcss-preset-env": "^7.7.2",
@@ -40,6 +44,7 @@
     "resolve-url-loader": "^5.0.0",
     "sass": "^1.53.0",
     "sass-loader": "^13.0.2",
+    "shx": "^0.3.4",
     "ts-loader": "^9.3.1",
     "typescript": "^4.7.4",
     "typescript-plugin-css-modules": "^3.4.0",
