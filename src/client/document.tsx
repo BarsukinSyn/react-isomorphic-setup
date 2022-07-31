@@ -6,14 +6,14 @@ export const doctype = '<!DOCTYPE html>'
 
 export const documentSeparator = '-~-'
 
-export interface RootProps {
+export interface DocumentProps {
   faviconPath?: string
   jsFilePaths?: string[]
   cssFilePaths?: string[]
   initialAppState?: InitialState
 }
 
-export const Root: FC<RootProps> = ({
+export const Document: FC<DocumentProps> = ({
   faviconPath = '',
   jsFilePaths = [],
   cssFilePaths = [],
