@@ -4,6 +4,7 @@ const { exec } = require('child_process')
 const { merge } = require('webpack-merge')
 const nodeExternals = require('webpack-node-externals')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const { WebpackManifestPlugin } = require('webpack-manifest-plugin')
 const ReactRefreshPlugin = require('@pmmmwh/react-refresh-webpack-plugin')
 
@@ -18,6 +19,7 @@ const clientPathMap = {
   output: resolve(buildPath, 'public')
 }
 const assetOutputPathMap = {
+  styles: 'styles/[name].css',
   manifest: resolve(buildPath, 'asset-manifest.json')
 }
 
@@ -60,6 +62,9 @@ const clientConfig = merge(common, {
         sockHost: `${devServer.host}:${devServer.port}`
       }
     }),
+    new MiniCssExtractPlugin({
+      filename: assetOutputPathMap.styles
+    }),
     new WebpackManifestPlugin({
       fileName: assetOutputPathMap.manifest,
       publicPath: PUBLIC_PATH,
@@ -74,6 +79,20 @@ const clientConfig = merge(common, {
         options: {
           configFile: 'tsconfig.json'
         }
+      },
+      {
+        test: /\.s?css$/,
+        use: [
+          MiniCssExtractPlugin.loader,
+          'css-loader',
+          'postcss-loader',
+          {
+            loader: 'sass-loader',
+            options: {
+              sourceMap: true // required for loaders preceding url resolver
+            }
+          }
+        ]
       }
     ]
   },
@@ -113,6 +132,20 @@ const serverConfig = merge(common, {
             module: 'CommonJS'
           }
         }
+      },
+      {
+        test: /\.s?css$/,
+        use: [
+          {
+            loader: 'css-loader',
+            options: {
+              modules: {
+                exportOnlyLocals: true
+              }
+            }
+          },
+          'sass-loader'
+        ]
       }
     ]
   },

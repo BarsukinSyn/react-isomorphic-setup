@@ -31,9 +31,9 @@ export class AppRenderer {
   }
 
   #renderDocument(): string {
-    const { js } = this.#assetManifestFileMap
+    const { js, css } = this.#assetManifestFileMap
     const document = ReactDOMServer.renderToStaticMarkup(
-      <Root jsFilePaths={js} />
+      <Root jsFilePaths={js} cssFilePaths={css} />
     )
 
     return document
