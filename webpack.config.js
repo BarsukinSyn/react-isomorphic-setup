@@ -10,7 +10,10 @@ const { WebpackManifestPlugin } = require('webpack-manifest-plugin')
 dotenv.config()
 
 const { NODE_ENV, PUBLIC_PATH } = process.env
+const IN_PROD = NODE_ENV === 'production'
 const IN_DEV = NODE_ENV === 'development'
+
+const outputChunkNameSubstitution = IN_DEV ? '[name]' : '[contenthash]'
 
 const srcPath = resolve(__dirname, 'src')
 const buildPath = resolve(__dirname, 'build')
@@ -22,13 +25,13 @@ const clientPathMap = {
 }
 
 const assetOutputPathMap = {
-  fonts: 'fonts/[name][ext]',
-  styles: 'styles/[name].css',
-  images: 'images/[name][ext]',
+  fonts: 'fonts/[base]',
+  images: 'images/[contenthash][ext]',
+  styles: `styles/${outputChunkNameSubstitution}.css`,
   manifest: resolve(buildPath, 'asset-manifest.json')
 }
 
-const commonConfig = {
+const commonBaseConfig = {
   resolve: {
     extensions: ['.js', '.ts', '.tsx']
   },
@@ -42,7 +45,7 @@ const commonConfig = {
   }
 }
 
-const clientConfig = merge(commonConfig, {
+const clientBaseConfig = merge(commonBaseConfig, {
   name: 'client',
   target: 'web',
   entry: {
@@ -50,7 +53,7 @@ const clientConfig = merge(commonConfig, {
   },
   output: {
     path: clientPathMap.output,
-    filename: '[name].js',
+    filename: `${outputChunkNameSubstitution}.js`,
     publicPath: PUBLIC_PATH
   },
   plugins: [
@@ -127,7 +130,7 @@ const clientConfig = merge(commonConfig, {
   }
 })
 
-const serverConfig = merge(commonConfig, {
+const serverBaseConfig = merge(commonBaseConfig, {
   name: 'server',
   target: 'node',
   entry: {
@@ -177,6 +180,29 @@ const serverConfig = merge(commonConfig, {
   externals: [nodeExternals()]
 })
 
+if (IN_PROD) {
+  const CompressionPlugin = require('compression-webpack-plugin')
+
+  const commonProdConfig = {
+    mode: 'production',
+    devtool: 'source-map'
+  }
+
+  const clientProdConfig = merge(clientBaseConfig, commonProdConfig, {
+    plugins: [
+      new CompressionPlugin({
+        test: /\.(js|css)?$/
+      })
+    ]
+  })
+
+  const serverProdConfig = merge(serverBaseConfig, commonProdConfig)
+
+  module.exports = [clientProdConfig, serverProdConfig]
+
+  return
+}
+
 if (IN_DEV) {
   const os = require('os')
   const NodemonPlugin = require('nodemon-webpack-plugin')
@@ -212,7 +238,7 @@ if (IN_DEV) {
     devtool: 'inline-source-map'
   }
 
-  const clientDevConfig = merge(clientConfig, commonDevConfig, {
+  const clientDevConfig = merge(clientBaseConfig, commonDevConfig, {
     devServer: webpackDevServerConfig,
     plugins: [
       new ReactRefreshPlugin({
@@ -225,7 +251,7 @@ if (IN_DEV) {
 
   const PORT = process.env.PORT ?? 8000
 
-  const serverDevConfig = merge(serverConfig, commonDevConfig, {
+  const serverDevConfig = merge(serverBaseConfig, commonDevConfig, {
     plugins: [
       new NodemonPlugin(),
       new WebpackOpenBrowser({
@@ -238,5 +264,3 @@ if (IN_DEV) {
 
   return
 }
-
-module.exports = [clientConfig, serverConfig]
