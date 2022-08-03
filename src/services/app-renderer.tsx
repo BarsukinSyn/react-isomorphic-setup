@@ -1,22 +1,23 @@
 import React from 'react'
 import ReactDOMServer from 'react-dom/server'
-import { ServerResponse as Response } from 'http'
+import { StaticRouter } from 'react-router-dom/server'
+import { IncomingMessage as Request, ServerResponse as Response } from 'http'
 
-import { App } from '../client/app'
-import { Root, doctype, documentSeparator } from '../client/root'
-import { AssetManifestFileMap } from './asset-manifest-mapper'
+import { App, InitialState } from '../client/app'
+import { Document, doctype, documentSeparator } from '../client/document'
+import { AssetManifestMap, AssetManifestMapper } from './asset-manifest-mapper'
 
 export class AppRenderer {
-  #assetManifestFileMap: AssetManifestFileMap
+  #assetManifestMap: AssetManifestMap
 
-  constructor(assetManifestFileMap: AssetManifestFileMap) {
-    this.#assetManifestFileMap = assetManifestFileMap
+  constructor(assetManifestMapper: AssetManifestMapper) {
+    this.#assetManifestMap = assetManifestMapper.map()
   }
 
-  renderToStream(res: Response) {
-    const document = this.#renderDocument()
+  render(req: Request, res: Response, initialAppState?: InitialState) {
+    const app = this.#buildApp(req.url!, initialAppState)
+    const document = this.#renderDocument(initialAppState)
     const [startOfDocument, endOfDocument] = document.split(documentSeparator)
-    const app = this.#buildApp()
 
     const stream = ReactDOMServer.renderToPipeableStream(app, {
       onShellReady() {
@@ -30,14 +31,23 @@ export class AppRenderer {
     })
   }
 
-  #renderDocument(): string {
-    const { favicon, js, css } = this.#assetManifestFileMap
+  #renderDocument(initialAppState?: InitialState): string {
+    const { favicon, js, css } = this.#assetManifestMap
     const document = ReactDOMServer.renderToStaticMarkup(
-      <Root faviconPath={favicon} jsFilePaths={js} cssFilePaths={css} />
+      <Document
+        faviconPath={favicon}
+        jsFilePaths={js}
+        cssFilePaths={css}
+        initialAppState={initialAppState}
+      />
     )
 
     return document
   }
 
-  #buildApp = () => <App />
+  #buildApp = (url: string, initialState?: InitialState) => (
+    <StaticRouter location={url}>
+      <App initialState={initialState} />
+    </StaticRouter>
+  )
 }
