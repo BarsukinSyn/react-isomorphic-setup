@@ -1,34 +1,37 @@
 const dotenv = require('dotenv')
 const { resolve } = require('path')
-const { exec } = require('child_process')
 const { merge } = require('webpack-merge')
 const CopyPlugin = require('copy-webpack-plugin')
 const nodeExternals = require('webpack-node-externals')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const { WebpackManifestPlugin } = require('webpack-manifest-plugin')
-const ReactRefreshPlugin = require('@pmmmwh/react-refresh-webpack-plugin')
 
 dotenv.config()
 
-const PUBLIC_PATH = process.env.PUBLIC_PATH
+const { NODE_ENV, PUBLIC_PATH } = process.env
+const IN_PROD = NODE_ENV === 'production'
+const IN_DEV = NODE_ENV === 'development'
+
+const outputChunkNameSubstitution = IN_DEV ? '[name]' : '[contenthash]'
 
 const srcPath = resolve(__dirname, 'src')
 const buildPath = resolve(__dirname, 'build')
 const staticPath = resolve(__dirname, 'public')
+
 const clientPathMap = {
   entry: resolve(srcPath, 'client', 'entry.tsx'),
   output: resolve(buildPath, 'public')
 }
+
 const assetOutputPathMap = {
-  fonts: 'fonts/[name][ext]',
-  styles: 'styles/[name].css',
-  images: 'images/[name][ext]',
+  fonts: 'fonts/[base]',
+  images: 'images/[contenthash][ext]',
+  styles: `styles/${outputChunkNameSubstitution}.css`,
   manifest: resolve(buildPath, 'asset-manifest.json')
 }
 
-const common = {
-  mode: 'development',
+const commonBaseConfig = {
   resolve: {
     extensions: ['.js', '.ts', '.tsx']
   },
@@ -42,22 +45,7 @@ const common = {
   }
 }
 
-const devServer = {
-  host: '0.0.0.0',
-  port: 8080,
-  static: false,
-  headers: {
-    'Access-Control-Allow-Origin': `*`
-  },
-  devMiddleware: {
-    writeToDisk: true
-  },
-  onListening() {
-    exec(`touch ${clientPathMap.entry}`) // hack for delayed launch of nodemon
-  }
-}
-
-const clientConfig = merge(common, {
+const clientBaseConfig = merge(commonBaseConfig, {
   name: 'client',
   target: 'web',
   entry: {
@@ -65,15 +53,11 @@ const clientConfig = merge(common, {
   },
   output: {
     path: clientPathMap.output,
-    filename: '[name].js'
+    filename: `${outputChunkNameSubstitution}.js`,
+    publicPath: PUBLIC_PATH
   },
   plugins: [
     new CleanWebpackPlugin(),
-    new ReactRefreshPlugin({
-      overlay: {
-        sockHost: `${devServer.host}:${devServer.port}`
-      }
-    }),
     new CopyPlugin({
       patterns: [
         { from: resolve(staticPath, 'root'), to: clientPathMap.output }
@@ -84,7 +68,6 @@ const clientConfig = merge(common, {
     }),
     new WebpackManifestPlugin({
       fileName: assetOutputPathMap.manifest,
-      publicPath: PUBLIC_PATH,
       filter: (file) => !file.isChunk || file.isInitial
     })
   ],
@@ -121,16 +104,14 @@ const clientConfig = merge(common, {
         test: /\.(gif|png|jpe?g)$/,
         type: 'asset/resource',
         generator: {
-          filename: assetOutputPathMap.images,
-          publicPath: PUBLIC_PATH
+          filename: assetOutputPathMap.images
         }
       },
       {
         test: /\.(ttf|otf|woff2?)$/,
         type: 'asset/resource',
         generator: {
-          filename: assetOutputPathMap.fonts,
-          publicPath: PUBLIC_PATH
+          filename: assetOutputPathMap.fonts
         }
       }
     ]
@@ -146,11 +127,10 @@ const clientConfig = merge(common, {
         }
       }
     }
-  },
-  devServer
+  }
 })
 
-const serverConfig = merge(common, {
+const serverBaseConfig = merge(commonBaseConfig, {
   name: 'server',
   target: 'node',
   entry: {
@@ -158,7 +138,8 @@ const serverConfig = merge(common, {
   },
   output: {
     path: buildPath,
-    filename: 'index.js'
+    filename: 'index.js',
+    publicPath: PUBLIC_PATH
   },
   module: {
     rules: [
@@ -191,7 +172,6 @@ const serverConfig = merge(common, {
         type: 'asset/resource',
         generator: {
           filename: assetOutputPathMap.images,
-          publicPath: PUBLIC_PATH,
           emit: false
         }
       }
@@ -200,4 +180,87 @@ const serverConfig = merge(common, {
   externals: [nodeExternals()]
 })
 
-module.exports = [clientConfig, serverConfig]
+if (IN_PROD) {
+  const CompressionPlugin = require('compression-webpack-plugin')
+
+  const commonProdConfig = {
+    mode: 'production',
+    devtool: 'source-map'
+  }
+
+  const clientProdConfig = merge(clientBaseConfig, commonProdConfig, {
+    plugins: [
+      new CompressionPlugin({
+        test: /\.(js|css)?$/
+      })
+    ]
+  })
+
+  const serverProdConfig = merge(serverBaseConfig, commonProdConfig)
+
+  module.exports = [clientProdConfig, serverProdConfig]
+
+  return
+}
+
+if (IN_DEV) {
+  const os = require('os')
+  const NodemonPlugin = require('nodemon-webpack-plugin')
+  const { WebpackOpenBrowser } = require('webpack-open-browser')
+  const ReactRefreshPlugin = require('@pmmmwh/react-refresh-webpack-plugin')
+
+  const networkInterfaceMap = os.networkInterfaces()
+  const networkInterfaceList = Object.values(networkInterfaceMap).flat()
+  const localAreaNetworkInterface = networkInterfaceList.find(
+    (interface) =>
+      !interface.internal &&
+      interface.family === 'IPv4' &&
+      interface.address !== '127.0.0.1'
+  )
+  const lanIPAddress = localAreaNetworkInterface?.address ?? 'localhost'
+
+  const webpackDevServerConfig = {
+    port: 8080,
+    static: false,
+    headers: {
+      'Access-Control-Allow-Origin': '*'
+    },
+    devMiddleware: {
+      writeToDisk: true
+    }
+  }
+
+  const publicPath = `http://${lanIPAddress}:${webpackDevServerConfig.port}/`
+
+  const commonDevConfig = {
+    mode: 'development',
+    output: { publicPath },
+    devtool: 'inline-source-map'
+  }
+
+  const clientDevConfig = merge(clientBaseConfig, commonDevConfig, {
+    devServer: webpackDevServerConfig,
+    plugins: [
+      new ReactRefreshPlugin({
+        overlay: {
+          sockHost: `http://${lanIPAddress}:${webpackDevServerConfig.port}`
+        }
+      })
+    ]
+  })
+
+  const PORT = process.env.PORT ?? 8000
+
+  const serverDevConfig = merge(serverBaseConfig, commonDevConfig, {
+    plugins: [
+      new NodemonPlugin(),
+      new WebpackOpenBrowser({
+        url: `http://localhost:${PORT}`
+      })
+    ]
+  })
+
+  module.exports = [clientDevConfig, serverDevConfig]
+
+  return
+}

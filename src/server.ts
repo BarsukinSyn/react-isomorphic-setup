@@ -8,7 +8,7 @@ import { serveStatic } from './middlewares/serve-static'
 
 dotenv.config()
 
-const { NODE_ENV = 'production', PORT = 8000 } = process.env
+const { NODE_ENV, PORT = 8000 } = process.env
 const IN_DEV = NODE_ENV === 'development'
 
 const assetManifestMapper = new AssetManifestMapper('asset-manifest.json')
