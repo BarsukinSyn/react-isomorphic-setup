@@ -1,9 +1,11 @@
-import React, { FC } from 'react'
+import React, { FC, Suspense, lazy } from 'react'
 import { Provider } from 'react-redux'
 import { Routes, Route } from 'react-router-dom'
 
-import { Catalog } from './catalog'
+import { Layout } from './shared/layout'
 import { Store } from './store'
+
+const Catalog = lazy(() => import('./catalog'))
 
 import './styles.scss'
 
@@ -14,7 +16,16 @@ export interface AppProps {
 export const App: FC<AppProps> = ({ store }) => (
   <Provider store={store}>
     <Routes>
-      <Route index element={<Catalog />} />
+      <Route path='/' element={<Layout />}>
+        <Route
+          index
+          element={
+            <Suspense fallback={<p>Flipping through an old book...</p>}>
+              <Catalog />
+            </Suspense>
+          }
+        />
+      </Route>
     </Routes>
   </Provider>
 )

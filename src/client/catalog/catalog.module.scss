@@ -1,35 +1,13 @@
-$breakpoint-sm: 36rem;
-
-.catalog {
-  padding: 0.75rem;
-  font-size: 1rem;
-
-  @media (min-width: $breakpoint-sm) {
-    box-sizing: border-box;
-    max-width: 36.25rem;
-    padding: 3rem 4rem;
-    margin: 0 auto;
-    font-size: 1.05rem;
-  }
+.list {
+  display: grid;
+  grid-template: 1fr / repeat(2, 1fr);
+  gap: 0 0.5em;
+  line-height: 1.75em;
+  list-style: decimal inside;
 }
 
-.title {
-  margin-bottom: 0.395em;
-  font-size: 1.5rem;
-
-  @media (min-width: $breakpoint-sm) {
-    font-size: 2.25rem;
-  }
-}
-
-.subtitle {
-  margin-bottom: 2em;
-  font-size: 1.05rem;
-  text-transform: lowercase;
-  opacity: 0.3;
-
-  @media (min-width: $breakpoint-sm) {
-    margin-bottom: 3em;
-    font-size: 1.25rem;
+.listItem {
+  &:nth-child(even) {
+    text-align: right;
   }
 }
