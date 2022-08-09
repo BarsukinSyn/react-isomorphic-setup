@@ -1,24 +1,22 @@
-import React, { FC, Suspense, lazy } from 'react'
+import React, { FC } from 'react'
 
 import styles from './catalog.module.scss'
-import './list/list.module.scss' // avoid flickering effect
 
-const List = lazy(() => import('./list'))
-
-export interface CatalogProps {
-  subtitle: string
+interface CatalogItem {
+  id: string
+  text: string
 }
 
-export const Catalog: FC<CatalogProps> = ({ subtitle }) => (
-  <main className={styles.catalog}>
-    <h1 className={styles.title}>
-      Welcome to the world of
-      <br />
-      Dungeons and Dragons
-    </h1>
-    <h3 className={styles.subtitle}>{subtitle}</h3>
-    <Suspense fallback={<p>Flipping through an old book...</p>}>
-      <List />
-    </Suspense>
-  </main>
+export interface CatalogProps {
+  itemList: CatalogItem[]
+}
+
+export const Catalog: FC<CatalogProps> = ({ itemList }) => (
+  <ol className={styles.list}>
+    {itemList.map(({ id, text }) => (
+      <li key={id} className={styles.listItem}>
+        {text}
+      </li>
+    ))}
+  </ol>
 )
