@@ -1,19 +1,15 @@
 import React, { FC } from 'react'
 
-import { spellAPI } from '../../api/spell'
-import { wrapPromise } from '../helpers/wrap-promise'
+import { useSelector, useDispatch } from '../hooks/useStore'
 
 import { Catalog } from './catalog.component'
-
-const resource = wrapPromise(spellAPI.fetchAll())
+import { fetchList } from './catalog.slice'
 
 export const CatalogContainer: FC = () => {
-  const apiResponse = resource.read()
-  const dataList = apiResponse.results
-  const linkList = dataList.map(({ name, index }) => ({
-    id: index,
-    text: name
-  }))
+  const dispatch = useDispatch()
+  const itemList = useSelector((state) => state.catalog.itemList)
 
-  return <Catalog itemList={linkList} />
+  if (!itemList.length) throw dispatch(fetchList())
+
+  return <Catalog itemList={itemList} />
 }
