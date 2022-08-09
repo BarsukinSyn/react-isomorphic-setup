@@ -3,7 +3,6 @@ import dotenv from 'dotenv'
 
 import { AppRenderer } from './services/app-renderer'
 import { AssetManifestMapper } from './services/asset-manifest-mapper'
-import { renderCatalog } from './middlewares/render-catalog'
 import { serveStatic } from './middlewares/serve-static'
 
 dotenv.config()
@@ -15,9 +14,8 @@ const assetManifestMapper = new AssetManifestMapper('asset-manifest.json')
 const appRenderer = new AppRenderer(assetManifestMapper)
 
 const assets = serveStatic({ clientBuildPath: 'public', dev: IN_DEV })
-const catalog = renderCatalog(appRenderer)
 
 polka()
   .use(assets)
-  .get('/', catalog)
+  .get('*', (req, res) => appRenderer.render(req, res))
   .listen(PORT, () => console.info('> Server is listening on port', PORT))

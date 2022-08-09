@@ -2,7 +2,7 @@ import { configureStore } from '@reduxjs/toolkit'
 
 import { catalogSlice } from './catalog'
 
-export const createStore = (preloadedState: any) =>
+export const createStore = (preloadedState?: any) =>
   configureStore({
     preloadedState,
     reducer: {
@@ -10,7 +10,7 @@ export const createStore = (preloadedState: any) =>
     }
   })
 
-type Store = ReturnType<typeof createStore>
+export type Store = ReturnType<typeof createStore>
 
 export type State = ReturnType<Store['getState']>
 
