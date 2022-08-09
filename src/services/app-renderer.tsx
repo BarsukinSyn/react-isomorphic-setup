@@ -1,10 +1,11 @@
-import React from 'react'
 import { Writable } from 'stream'
+import React, { ReactElement } from 'react'
 import { StaticRouter } from 'react-router-dom/server'
 import { IncomingMessage as Request, ServerResponse as Response } from 'http'
 import { renderToPipeableStream, renderToStaticMarkup } from 'react-dom/server'
 
-import { App, InitialState } from '../client/app'
+import { App } from '../client/app'
+import { createStore, Store, State } from '../client/store'
 import { Document, doctype, documentSeparator } from '../client/document'
 import { AssetManifestMap, AssetManifestMapper } from './asset-manifest-mapper'
 
@@ -15,17 +16,21 @@ export class AppRenderer {
     this.#assetManifestMap = assetManifestMapper.map()
   }
 
-  render(req: Request, res: Response, initialAppState?: InitialState) {
-    const app = this.#buildApp(req.url!, initialAppState)
-    const document = this.#renderDocument(initialAppState)
+  render(req: Request, res: Response) {
+    const store = createStore()
+    const document = this.#renderDocument()
+    const app = this.#buildApp(req.url!, store)
     const [startOfDocument, endOfDocument] = document.split(documentSeparator)
 
     const documentStream = new Writable({
       write(...args) {
         res.write(...args)
       },
-      final() {
-        res.end(`${endOfDocument}`)
+      final: () => {
+        const state = store.getState()
+        const stateScriptTag = this.#persistStateInScriptTag(state)
+
+        res.end(`${stateScriptTag}${endOfDocument}`)
       }
     })
 
@@ -40,23 +45,29 @@ export class AppRenderer {
     })
   }
 
-  #renderDocument(initialAppState?: InitialState): string {
+  #renderDocument(): string {
     const { favicon, js, css } = this.#assetManifestMap
     const document = renderToStaticMarkup(
-      <Document
-        faviconPath={favicon}
-        jsFilePaths={js}
-        cssFilePaths={css}
-        initialAppState={initialAppState}
-      />
+      <Document faviconPath={favicon} jsFilePaths={js} cssFilePaths={css} />
     )
 
     return document
   }
 
-  #buildApp = (url: string, initialState?: InitialState) => (
-    <StaticRouter location={url}>
-      <App initialState={initialState} />
-    </StaticRouter>
-  )
+  #buildApp(location: string, store: Store): ReactElement {
+    return (
+      <StaticRouter location={location}>
+        <App store={store} />
+      </StaticRouter>
+    )
+  }
+
+  #persistStateInScriptTag(state: State): string {
+    const stateString = JSON.stringify(state)
+    const stateScriptTag = renderToStaticMarkup(
+      <script id='initial-state' data-state-string={stateString} />
+    )
+
+    return stateScriptTag
+  }
 }

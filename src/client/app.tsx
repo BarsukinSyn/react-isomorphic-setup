@@ -2,19 +2,17 @@ import React, { FC } from 'react'
 import { Provider } from 'react-redux'
 import { Routes, Route } from 'react-router-dom'
 
-import { createStore, State } from './store'
 import { Catalog } from './catalog'
+import { Store } from './store'
 
 import './styles.scss'
 
-export type InitialState = Partial<State>
-
 export interface AppProps {
-  initialState?: InitialState
+  store: Store
 }
 
-export const App: FC<AppProps> = ({ initialState }) => (
-  <Provider store={createStore(initialState)}>
+export const App: FC<AppProps> = ({ store }) => (
+  <Provider store={store}>
     <Routes>
       <Route index element={<Catalog />} />
     </Routes>
