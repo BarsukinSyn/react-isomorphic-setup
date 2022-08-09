@@ -1,7 +1,8 @@
 import React from 'react'
-import ReactDOMServer from 'react-dom/server'
+import { Writable } from 'stream'
 import { StaticRouter } from 'react-router-dom/server'
 import { IncomingMessage as Request, ServerResponse as Response } from 'http'
+import { renderToPipeableStream, renderToStaticMarkup } from 'react-dom/server'
 
 import { App, InitialState } from '../client/app'
 import { Document, doctype, documentSeparator } from '../client/document'
@@ -19,21 +20,29 @@ export class AppRenderer {
     const document = this.#renderDocument(initialAppState)
     const [startOfDocument, endOfDocument] = document.split(documentSeparator)
 
-    const stream = ReactDOMServer.renderToPipeableStream(app, {
+    const documentStream = new Writable({
+      write(...args) {
+        res.write(...args)
+      },
+      final() {
+        res.end(`${endOfDocument}`)
+      }
+    })
+
+    const appStream = renderToPipeableStream(app, {
       onShellReady() {
         res.write(`${doctype}${startOfDocument}`)
-        stream.pipe(res).write(endOfDocument)
+        appStream.pipe(documentStream)
       },
       onError(error) {
         console.error(error)
-        res.writeHead(500).end('500 Internal Server Error')
       }
     })
   }
 
   #renderDocument(initialAppState?: InitialState): string {
     const { favicon, js, css } = this.#assetManifestMap
-    const document = ReactDOMServer.renderToStaticMarkup(
+    const document = renderToStaticMarkup(
       <Document
         faviconPath={favicon}
         jsFilePaths={js}
