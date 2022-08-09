@@ -1,13 +1,19 @@
 import React, { FC } from 'react'
 
-import { useSelector } from '../hooks/useStore'
+import { spellAPI } from '../../api/spell'
+import { wrapPromise } from '../helpers/wrap-promise'
 
 import { Catalog } from './catalog.component'
 
-export const CatalogContainer: FC = () => {
-  const personalizedSubtitle = useSelector(
-    (state) => state.catalog.personalizedSubtitle
-  )
+const resource = wrapPromise(spellAPI.fetchAll())
 
-  return <Catalog subtitle={personalizedSubtitle} />
+export const CatalogContainer: FC = () => {
+  const apiResponse = resource.read()
+  const dataList = apiResponse.results
+  const linkList = dataList.map(({ name, index }) => ({
+    id: index,
+    text: name
+  }))
+
+  return <Catalog itemList={linkList} />
 }
