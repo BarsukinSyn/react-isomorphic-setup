@@ -1,13 +1,15 @@
 import React, { FC } from 'react'
 
-import { useSelector } from '../hooks/useStore'
+import { useSelector, useDispatch } from '../hooks/useStore'
 
 import { Catalog } from './catalog.component'
+import { fetchList } from './catalog.slice'
 
 export const CatalogContainer: FC = () => {
-  const personalizedSubtitle = useSelector(
-    (state) => state.catalog.personalizedSubtitle
-  )
+  const dispatch = useDispatch()
+  const itemList = useSelector((state) => state.catalog.itemList)
 
-  return <Catalog subtitle={personalizedSubtitle} />
+  if (!itemList.length) throw dispatch(fetchList())
+
+  return <Catalog itemList={itemList} />
 }

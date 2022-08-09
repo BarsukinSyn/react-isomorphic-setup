@@ -1,7 +1,5 @@
 import React, { FC } from 'react'
 
-import { InitialState } from './app'
-
 export const doctype = '<!DOCTYPE html>'
 
 export const documentSeparator = '-~-'
@@ -10,19 +8,13 @@ export interface DocumentProps {
   faviconPath?: string
   jsFilePaths?: string[]
   cssFilePaths?: string[]
-  initialAppState?: InitialState
 }
 
 export const Document: FC<DocumentProps> = ({
   faviconPath = '',
   jsFilePaths = [],
-  cssFilePaths = [],
-  initialAppState = {}
+  cssFilePaths = []
 }) => {
-  const initialAppStateString = JSON.stringify(initialAppState)
-  const initialAppStateScriptTag = (
-    <script id='initial-state' data-state-string={initialAppStateString} />
-  )
   const faviconLinkTag = faviconPath && (
     <link rel='icon' type='image/x-icon' href={faviconPath} />
   )
@@ -47,7 +39,6 @@ export const Document: FC<DocumentProps> = ({
       <body>
         <noscript>You need to enable JavaScript to use this app</noscript>
         <div id='root'>{documentSeparator}</div>
-        {initialAppStateScriptTag}
       </body>
     </html>
   )
