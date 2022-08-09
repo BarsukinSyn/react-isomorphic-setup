@@ -1,5 +1,7 @@
 import React, { FC, Suspense, lazy } from 'react'
 
+import { SafariHack } from './safari-hack'
+
 import styles from './catalog.module.scss'
 import './list/list.module.scss' // avoid flickering effect
 
@@ -20,5 +22,6 @@ export const Catalog: FC<CatalogProps> = ({ subtitle }) => (
     <Suspense fallback={<p>Flipping through an old book...</p>}>
       <List />
     </Suspense>
+    <SafariHack />
   </main>
 )
