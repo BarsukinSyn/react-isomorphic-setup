@@ -1,13 +1,42 @@
+$breakpoint-sm: 36rem;
+
 .list {
-  display: grid;
-  grid-template: 1fr / repeat(2, 1fr);
-  gap: 0 0.5em;
+  font-size: 1.05rem;
   line-height: 1.75em;
   list-style: decimal inside;
+
+  @media (min-width: $breakpoint-sm) {
+    display: grid;
+    grid-template: 1fr / repeat(2, 1fr);
+    gap: 0 0.5em;
+  }
 }
 
 .listItem {
-  &:nth-child(even) {
-    text-align: right;
+  @media (min-width: $breakpoint-sm) {
+    &:nth-child(even) {
+      text-align: right;
+    }
+  }
+}
+
+.button {
+  display: block;
+  padding: 0.25em 0.75em 0.3em;
+  margin: 3em auto 0;
+  font-size: 1rem;
+  border: 1px solid;
+  outline: none;
+  color: inherit;
+  background-color: transparent;
+  cursor: pointer;
+  transition: background-color linear 0.25s;
+
+  &[hidden] {
+    display: none;
+  }
+
+  &:hover {
+    background-color: rgba(#aaa, 0.25);
   }
 }

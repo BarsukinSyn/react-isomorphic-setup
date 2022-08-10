@@ -1,15 +1,21 @@
 import React, { FC } from 'react'
 
-import { useSelector, useDispatch } from '../hooks/useStore'
+import { useToggle } from '../shared/hooks/useToggle'
 
 import { Catalog } from './catalog.component'
-import { fetchList } from './catalog.slice'
+import { useItemList } from './catalog.hooks'
 
 export const CatalogContainer: FC = () => {
-  const dispatch = useDispatch()
-  const itemList = useSelector((state) => state.catalog.itemList)
+  const [itemListLimit, toggleItemListLimit] = useToggle(10, undefined)
+  const [itemList, fetchItemList] = useItemList(itemListLimit)
 
-  if (!itemList.length) throw dispatch(fetchList())
+  if (!itemList) throw fetchItemList()
 
-  return <Catalog itemList={itemList} />
+  return (
+    <Catalog
+      itemList={itemList}
+      hidden={!!itemListLimit}
+      onActionButtonClick={toggleItemListLimit}
+    />
+  )
 }
