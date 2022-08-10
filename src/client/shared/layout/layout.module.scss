@@ -1,7 +1,7 @@
 $breakpoint-sm: 36rem;
 
 .catalog {
-  padding: 0.75rem;
+  padding: 1rem;
   font-size: 1rem;
 
   @media (min-width: $breakpoint-sm) {
@@ -24,7 +24,7 @@ $breakpoint-sm: 36rem;
 
 .subtitle {
   margin-bottom: 2em;
-  font-size: 1.05rem;
+  font-size: 1.15rem;
   text-transform: lowercase;
   opacity: 0.3;
 
