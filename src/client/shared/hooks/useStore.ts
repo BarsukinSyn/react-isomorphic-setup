@@ -4,7 +4,7 @@ import {
   useSelector as useReduxSelector
 } from 'react-redux'
 
-import { State, Dispatch } from '../store'
+import { State, Dispatch } from '../../store'
 
 export const useDispatch: () => Dispatch = useReduxDispatch
 

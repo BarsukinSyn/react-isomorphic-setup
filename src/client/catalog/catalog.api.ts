@@ -14,22 +14,18 @@ type ItemList = List<Item>
 async function fetchAPI<T>(path: string = ''): Promise<T> {
   const baseURL = 'https://www.dnd5eapi.co/api'
   const response = await fetch(`${baseURL}/${path}`)
-  const body = new Response(response.body)
-  const result = body.json()
+  const data = response.json()
 
-  return result
+  return data
 }
 
-async function fetchList() {
-  const response = await fetchAPI<ItemList>('spells')
-  const itemList = response.results.map(({ index, name }) => ({
-    id: index,
-    text: name
-  }))
+async function fetchItemList() {
+  const data = await fetchAPI<ItemList>('spells')
+  const itemList = data.results.map(({ index, name }) => ({ index, name }))
 
   return itemList
 }
 
 export const catalogAPI = {
-  fetchList
+  fetchItemList
 }

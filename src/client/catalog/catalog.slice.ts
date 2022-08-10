@@ -3,27 +3,28 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { catalogAPI } from './catalog.api'
 
 interface CatalogItem {
-  id: string
-  text: string
+  index: string
+  name: string
 }
 
 interface CatalogState {
-  itemList: CatalogItem[]
+  itemList?: CatalogItem[]
 }
 
-const initialState: CatalogState = {
-  itemList: []
-}
+const initialState: CatalogState = {}
 
-export const fetchList = createAsyncThunk('catalog/list', catalogAPI.fetchList)
+export const fetchItemList = createAsyncThunk(
+  'catalog/itemList',
+  catalogAPI.fetchItemList
+)
 
 export const catalogSlice = createSlice({
   name: 'catalog',
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(fetchList.fulfilled, (state, action) => {
-      state.itemList.push(...action.payload)
+    builder.addCase(fetchItemList.fulfilled, (state, action) => {
+      state.itemList = action.payload
     })
   }
 })
