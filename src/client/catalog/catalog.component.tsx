@@ -3,20 +3,35 @@ import React, { FC } from 'react'
 import styles from './catalog.module.scss'
 
 interface CatalogItem {
-  id: string
-  text: string
+  index: string
+  name: string
 }
 
 export interface CatalogProps {
-  itemList: CatalogItem[]
+  hidden?: boolean
+  itemList?: CatalogItem[]
+  onActionButtonClick?: VoidFunction
 }
 
-export const Catalog: FC<CatalogProps> = ({ itemList }) => (
-  <ol className={styles.list}>
-    {itemList.map(({ id, text }) => (
-      <li key={id} className={styles.listItem}>
-        {text}
-      </li>
-    ))}
-  </ol>
+export const Catalog: FC<CatalogProps> = ({
+  hidden,
+  itemList = [],
+  onActionButtonClick
+}) => (
+  <section>
+    <ol className={styles.list}>
+      {itemList.map(({ index, name }) => (
+        <li key={index} className={styles.listItem}>
+          {name}
+        </li>
+      ))}
+    </ol>
+    <button
+      hidden={!hidden}
+      onClick={onActionButtonClick}
+      className={styles.button}
+    >
+      Not enough for you?
+    </button>
+  </section>
 )
