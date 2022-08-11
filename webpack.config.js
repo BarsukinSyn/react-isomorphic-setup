@@ -253,7 +253,9 @@ if (IN_DEV) {
 
   const serverDevConfig = merge(serverBaseConfig, commonDevConfig, {
     plugins: [
-      new NodemonPlugin(),
+      new NodemonPlugin({
+        delay: 100
+      }),
       new WebpackOpenBrowser({
         url: `http://localhost:${PORT}`
       })
