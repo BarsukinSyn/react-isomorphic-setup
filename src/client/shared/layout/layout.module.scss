@@ -7,8 +7,8 @@ $breakpoint-sm: 36rem;
   @media (min-width: $breakpoint-sm) {
     box-sizing: border-box;
     max-width: 36.25rem;
-    padding: 3rem 4rem;
     margin: 0 auto;
+    padding: 3rem 4rem;
     font-size: 1.05rem;
   }
 }
