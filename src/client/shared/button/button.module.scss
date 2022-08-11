@@ -1,0 +1,19 @@
+.button {
+  display: block;
+  padding: 0.25em 0.75em 0.3em;
+  font-size: 1rem;
+  border: 1px solid;
+  outline: none;
+  color: inherit;
+  background-color: transparent;
+  cursor: pointer;
+  transition: background-color linear 0.25s;
+
+  &[hidden] {
+    display: none;
+  }
+
+  &:hover {
+    background-color: rgba(#aaa, 0.25);
+  }
+}

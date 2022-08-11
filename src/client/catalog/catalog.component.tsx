@@ -1,5 +1,8 @@
 import React, { FC } from 'react'
 
+import { List } from '../shared/list'
+import { Button } from '../shared/button'
+
 import styles from './catalog.module.scss'
 
 interface CatalogItem {
@@ -8,30 +11,28 @@ interface CatalogItem {
 }
 
 export interface CatalogProps {
-  hidden?: boolean
   itemList?: CatalogItem[]
+  hideActionButton?: boolean
   onActionButtonClick?: VoidFunction
 }
 
 export const Catalog: FC<CatalogProps> = ({
-  hidden,
   itemList = [],
+  hideActionButton,
   onActionButtonClick
 }) => (
   <section>
-    <ol className={styles.list}>
+    <List>
       {itemList.map(({ index, name }) => (
-        <li key={index} className={styles.listItem}>
-          {name}
-        </li>
+        <li key={index}>{name}</li>
       ))}
-    </ol>
-    <button
-      hidden={!hidden}
+    </List>
+    <Button
+      hidden={hideActionButton}
       onClick={onActionButtonClick}
       className={styles.button}
     >
       Not enough for you?
-    </button>
+    </Button>
   </section>
 )
