@@ -14,7 +14,7 @@ export const CatalogContainer: FC = () => {
   return (
     <Catalog
       itemList={itemList}
-      hidden={!!itemListLimit}
+      hideActionButton={!itemListLimit}
       onActionButtonClick={toggleItemListLimit}
     />
   )

@@ -1,0 +1,24 @@
+$breakpoint-sm: 36rem;
+
+ol.list {
+  list-style: decimal inside;
+}
+
+.list {
+  font-size: 1.05rem;
+  line-height: 1.75em;
+
+  @media (min-width: $breakpoint-sm) {
+    display: grid;
+    grid-template: 1fr / repeat(2, 1fr);
+    gap: 0 0.5em;
+  }
+}
+
+.listItem {
+  @media (min-width: $breakpoint-sm) {
+    &:nth-child(even) {
+      text-align: right;
+    }
+  }
+}
