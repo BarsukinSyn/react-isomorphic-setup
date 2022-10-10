@@ -13,8 +13,6 @@ const { NODE_ENV, PUBLIC_PATH } = process.env
 const IN_PROD = NODE_ENV === 'production'
 const IN_DEV = NODE_ENV === 'development'
 
-const outputChunkNameSubstitution = IN_DEV ? '[name]' : '[contenthash]'
-
 const srcPath = resolve(__dirname, 'src')
 const buildPath = resolve(__dirname, 'build')
 const staticPath = resolve(__dirname, 'public')
@@ -23,6 +21,8 @@ const clientPathMap = {
   entry: resolve(srcPath, 'client', 'entry.tsx'),
   output: resolve(buildPath, 'public')
 }
+
+const outputChunkNameSubstitution = IN_PROD ? '[contenthash]' : '[name]'
 
 const assetOutputPathMap = {
   fonts: 'fonts/[base]',
@@ -59,9 +59,7 @@ const clientBaseConfig = merge(commonBaseConfig, {
   plugins: [
     new CleanWebpackPlugin(),
     new CopyPlugin({
-      patterns: [
-        { from: resolve(staticPath, 'root'), to: clientPathMap.output }
-      ]
+      patterns: [{ from: resolve(staticPath, '*.*'), to: buildPath }]
     }),
     new MiniCssExtractPlugin({
       filename: assetOutputPathMap.styles
@@ -219,7 +217,7 @@ if (IN_DEV) {
   )
   const lanIPAddress = localAreaNetworkInterface?.address ?? 'localhost'
 
-  const webpackDevServerConfig = {
+  const webpackDevServer = {
     port: 8080,
     static: false,
     headers: {
@@ -230,20 +228,22 @@ if (IN_DEV) {
     }
   }
 
-  const publicPath = `http://${lanIPAddress}:${webpackDevServerConfig.port}/`
+  const webpackDevServerURL = `http://${lanIPAddress}:${webpackDevServer.port}`
 
   const commonDevConfig = {
     mode: 'development',
-    output: { publicPath },
-    devtool: 'inline-source-map'
+    devtool: 'inline-source-map',
+    output: {
+      publicPath: `${webpackDevServerURL}/`
+    }
   }
 
   const clientDevConfig = merge(clientBaseConfig, commonDevConfig, {
-    devServer: webpackDevServerConfig,
+    devServer: webpackDevServer,
     plugins: [
       new ReactRefreshPlugin({
         overlay: {
-          sockHost: `http://${lanIPAddress}:${webpackDevServerConfig.port}`
+          sockHost: webpackDevServerURL
         }
       })
     ]
